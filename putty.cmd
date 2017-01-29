@@ -1,0 +1,1 @@
+"C:\Program Files (x86)\putty\putty.exe" -ssh pi@192.168.0.142 22 &
