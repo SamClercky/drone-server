@@ -23,7 +23,7 @@ class Main:
                 stdout.flush()
                 # End of fancy printing
 
-        except Exception as err:
+        except Exception, err:
             print("ERROR: " + str(err))
 
 if __name__ == "__main__":

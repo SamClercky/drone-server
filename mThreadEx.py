@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-from queue import Queue
+from Queue import Queue
 from threading import Thread
 
 q = Queue()
