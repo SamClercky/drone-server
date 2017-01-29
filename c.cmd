@@ -1,0 +1,1 @@
+ROBOCOPY ./ Z:\Documents\drone * /E /XO /XD .git
