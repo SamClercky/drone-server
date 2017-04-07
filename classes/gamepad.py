@@ -18,10 +18,10 @@ class JoyStick:
 
     def __loop(self, q, lock):
         """Should run in separate thread"""
-        lock.acquire()
+        self.lock.acquire()
         run = self.started
         gamePad = self.gamePad
-        lock.release()
+        self.lock.release()
 
         for e in gamePad.read_loop():
             # Kijken wat er gebeurt en dit doorgeven aan de rest v/h programma
@@ -32,15 +32,15 @@ class JoyStick:
             elif x == 314:
                 q.put("STOP::" + str(v))
             elif x == 16:
-                q.put("LEFT::" + str(self.__nomelize(v, 1, 65535)))
+                q.put("LEFT::" + str(self.__nomelize(v, 1, 31267)+1500))
             elif x == 16:
-                q.put("RIGHT::" + str(self.__nomelize(v, 1, 65535)))
+                q.put("RIGHT::" + str(self.__nomelize(v, 1, 31267)+1500))
             elif x == 17:
-                q.put("FORWARD::" + str(self.__nomelize(v, 1, 65535)))
+                q.put("FORWARD::" + str(self.__nomelize(v, 1, 31267)+1500))
             elif x == 17:
-                q.put("BACK::" + str(self.__nomelize(v, 1, 65535)))
+                q.put("BACK::" + str(self.__nomelize(v, 1, 31267)+1500))
             elif x == 5:
-                q.put("HIGH::" + str(self.__nomelize(v, 255, 65535)))
+                q.put("HIGH::" + str(self.__nomelize(v, 255, 30767)+2000))
             elif x != 0:
                 q.put("IDLE::")
 
