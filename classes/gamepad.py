@@ -5,6 +5,7 @@ from evdev import InputDevice, categorize, ecodes, KeyEvent
 from multiprocessing import Queue
 from threading import Lock
 from threading import Thread
+from time import time
 
 class JoyStick:
     """A controller class who monitors the user input via a logitech f710 gamepad"""
@@ -23,6 +24,8 @@ class JoyStick:
         gamePad = self.gamePad
         self.lock.release()
 
+        lastStop = 0
+
         for e in gamePad.read_loop():
             # Kijken wat er gebeurt en dit doorgeven aan de rest v/h programma
             x = e.code
@@ -31,14 +34,30 @@ class JoyStick:
                 q.put("START::" + str(v))
             elif x == 314:
                 q.put("STOP::" + str(v))
+
+                now = int(time())
+                if (now-lastStop) < 3 and v == 1:
+                    q.put("STOPSTOP::")
             elif x == 16:
-                q.put("LEFT::" + str(self.__nomelize(v, 1, 31267)+1500))
+                if v == 1:
+                    q.put("LEFT::" + str(self.__nomelize(v, 1, 31267)+1500))
+                else:
+                    q.put("LEFT::" + str(self.__nomelize(v, 32767, 31267)+1500))
             elif x == 16:
-                q.put("RIGHT::" + str(self.__nomelize(v, 1, 31267)+1500))
+                if v == 1:
+                    q.put("RIGHT::" + str(self.__nomelize(v, 1, 31267)+1500))
+                else:
+                    q.put("RIGHT::" + str(self.__nomelize(v, 32767, 31267)+1500))
             elif x == 17:
-                q.put("FORWARD::" + str(self.__nomelize(v, 1, 31267)+1500))
+                if v == 1:
+                    q.put("FORWARD::" + str(self.__nomelize(v, 1, 31267)+1500))
+                else:
+                    q.put("FORWARD::" + str(self.__nomelize(v, 32767, 31267)+1500))
             elif x == 17:
-                q.put("BACK::" + str(self.__nomelize(v, 1, 31267)+1500))
+                if v == 1:
+                    q.put("BACK::" + str(self.__nomelize(v, 1, 31267)+1500))
+                else:
+                    q.put("BACK::" + str(self.__nomelize(v, 32767, 31267)+1500))
             elif x == 5:
                 q.put("HIGH::" + str(self.__nomelize(v, 255, 30767)+2000))
             elif x != 0:
@@ -56,6 +75,7 @@ class JoyStick:
         """Starts the thread"""
         self.started = True
         self.thread = Thread(target=self.__loop, args=(self.q, self.lock))
+        self.thread.setDaemon(True)
         self.thread.start()
 
     def stop(self):

@@ -54,6 +54,8 @@ class MultiWii:
     IS_SERIAL = 211
     DEBUG = 254
 
+    timeMSP = 0.02
+
 
     """Class initialization"""
     def __init__(self, serPort):
@@ -81,7 +83,7 @@ class MultiWii:
         self.ser.dsrdtr = False
         self.ser.writeTimeout = 2
         """Time to wait until the board becomes operational"""
-        wakeup = 3
+        wakeup = 5
         try:
             self.ser.open()
             if self.PRINT:
@@ -105,10 +107,10 @@ class MultiWii:
         try:
             b = None
             b = self.ser.write(struct.pack('<3c2B%dhB' % len(data), *total_data))
+            time.sleep(self.timeMSP)
         except Exception, error:
-            #print "\n\nError in sendCMD."
-            #print "("+str(error)+")\n\n"
-            pass
+            print("\n\nError in sendCMD.")
+            print("("+str(error)+")\n\n")
 
     """Function for sending a command to the board and receive attitude"""
     """

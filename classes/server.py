@@ -32,6 +32,7 @@ class Server():
     
     def start(self):
         self.tornado = Thread(target=ioloop.IOLoop.current().start)
+        self.tornado.setDaemon(True)
         self.tornado.start()
     
     def stop(self):

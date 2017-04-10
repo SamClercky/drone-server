@@ -6,7 +6,6 @@ from classes.pyMultiwii import MultiWii
 class SendCommands:
     board = None
     cmd = [1500, 1500, 2000, 1000] # init setup
-    lock = Lock()
     thread = None
 
     def __init__(self, board):
@@ -16,14 +15,13 @@ class SendCommands:
     def start(self):
         print("sendCommands loop starts")
         self.thread = Thread(target=self._loop)
+        self.thread.setDaemon(True)
         self.thread.start()
 
     def _loop(self):
         while True:
             print("loop")
-            self.lock.acquire()
             cmd = self.cmd
-            self.lock.release()
             self.board.sendCMD(8, MultiWii.SET_RAW_RC, cmd)
 
     def _formData(self, msg, prevData):
@@ -68,10 +66,4 @@ class SendCommands:
     def excecute(self, msg):
         """brings msg into queue"""
         print(msg)
-        self.lock.acquire()
-        data = [msg, self.cmd]
-        self.lock.release()
-        data = self._formData(data[0], data[1])
-        self.lock.acquire()
-        self.cmd = data
-        self.lock.release()
+        self.cmd = self._formData(msg, self.cmd)

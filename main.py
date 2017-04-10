@@ -3,12 +3,14 @@
 """Startpunt voor het programme van de drone"""
 
 from classes.pyMultiwii import MultiWii
-from sys import stdout
+from sys import exit
 from classes.server import Server
 from classes.gamepad import JoyStick
 from classes.sendCommands import SendCommands
 from multiprocessing import Queue
 from threading import Lock
+import subprocess
+from time import sleep
 
 
 class Main:
@@ -41,17 +43,25 @@ class Main:
 
     def excecute(self, msg):
         """Executes the message"""
+        if msg == "STOPSTOP::":
+            raise KeyboardInterrupt
         self.sendCommands.excecute(msg)
 
 if __name__ == "__main__":
     try:
+        print("Sleeping till system is fully opperationel...")
+        sleep(10)
         main = Main()
         print("Main aangeroepen")
         main.loop()
     except KeyboardInterrupt:
-        main.server.stop()
-        main.joystick.stop()
-        for t in enumerate():
-            if t.isAlive():
-                t._Thread_stop()
+        subprocess.Popen("shutdown -h now")
+        main.server.tornado.join()
+        main.joystick.thread.join()
+        main.sendCommands.thread.join()
         exit(0)
+    except Exception:
+        main.server.tornado.join()
+        main.joystick.thread.join()
+        main.sendCommands.thread.join()
+        exit(1)
