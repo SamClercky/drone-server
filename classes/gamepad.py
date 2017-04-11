@@ -38,22 +38,23 @@ class JoyStick:
                 now = int(time())
                 if (now-lastStop) < 3 and v == 1:
                     q.put("STOPSTOP::")
-            elif x == 16:
+                lastStop = now
+            elif (x == 16 or x == 0) and v <= 0:
                 if v == 1:
                     q.put("LEFT::" + str(self.__nomelize(v, 1, 31267)+1500))
                 else:
                     q.put("LEFT::" + str(self.__nomelize(v, 32767, 31267)+1500))
-            elif x == 16:
-                if v == 1:
+            elif (x == 16 or x == 0) and v > 0:
+                if v == -1:
                     q.put("RIGHT::" + str(self.__nomelize(v, 1, 31267)+1500))
                 else:
                     q.put("RIGHT::" + str(self.__nomelize(v, 32767, 31267)+1500))
-            elif x == 17:
+            elif (x == 17 or x == 1) and v >= 0:
                 if v == 1:
                     q.put("FORWARD::" + str(self.__nomelize(v, 1, 31267)+1500))
                 else:
                     q.put("FORWARD::" + str(self.__nomelize(v, 32767, 31267)+1500))
-            elif x == 17:
+            elif (x == 17 or x == 1) and v < 0:
                 if v == 1:
                     q.put("BACK::" + str(self.__nomelize(v, 1, 31267)+1500))
                 else:

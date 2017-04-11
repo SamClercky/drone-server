@@ -3,6 +3,6 @@
 # shout run inside rc.local
 
 (
-    python /home/pi/Documents/drone/main.py
+    python "/home/pi/Documents/drone/main.py"
     echo $?
- ) & > /home/pi/droneLog.txt
+ ) & >> /home/pi/droneLog.txt

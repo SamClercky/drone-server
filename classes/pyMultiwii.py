@@ -54,7 +54,7 @@ class MultiWii:
     IS_SERIAL = 211
     DEBUG = 254
 
-    timeMSP = 0.02
+    timeMSP = 0.1
 
 
     """Class initialization"""
@@ -86,6 +86,8 @@ class MultiWii:
         wakeup = 5
         try:
             self.ser.open()
+            while self.ser.isOpen() == False: # wait till serial is open
+                pass
             if self.PRINT:
                 print("Waking up board on "+self.ser.port+"...")
             for i in range(1,wakeup):
@@ -107,10 +109,10 @@ class MultiWii:
         try:
             b = None
             b = self.ser.write(struct.pack('<3c2B%dhB' % len(data), *total_data))
-            time.sleep(self.timeMSP)
         except Exception, error:
             print("\n\nError in sendCMD.")
             print("("+str(error)+")\n\n")
+        time.sleep(self.timeMSP)
 
     """Function for sending a command to the board and receive attitude"""
     """
@@ -152,8 +154,8 @@ class MultiWii:
             self.attitude['timestamp']="%0.2f" % (time.time(),) 
             return self.attitude
         except Exception, error:
-            #print "\n\nError in sendCMDreceiveATT."
-            #print "("+str(error)+")\n\n"
+            print "\n\nError in sendCMDreceiveATT."
+            print "("+str(error)+")\n\n"
             pass
 
     """Function to arm / disarm """
@@ -190,6 +192,8 @@ class MultiWii:
     """Function to receive a data packet from the board"""
     def getData(self, cmd):
         try:
+            self.ser.flushInput()
+            self.ser.flushOutput()
             start = time.time()
             self.sendCMD(0,cmd,[])
             while True:
@@ -201,8 +205,6 @@ class MultiWii:
             code = struct.unpack('<b', self.ser.read())
             data = self.ser.read(datalength)
             temp = struct.unpack('<'+'h'*(datalength/2),data)
-            self.ser.flushInput()
-            self.ser.flushOutput()
             elapsed = time.time() - start
             if cmd == MultiWii.ATTITUDE:
                 self.attitude['angx']=float(temp[0]/10.0)

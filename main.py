@@ -11,6 +11,7 @@ from multiprocessing import Queue
 from threading import Lock
 import subprocess
 from time import sleep
+import datetime
 
 
 class Main:
@@ -19,7 +20,6 @@ class Main:
     def __init__(self):
         self.queue = Queue()
         self.board = MultiWii("/dev/ttyACM0")
-        self.board.getData(MultiWii.ATTITUDE)
         self.lock = Lock()
         self.sendCommands = SendCommands(self.board)
         print("Eerste data ontvangen")
@@ -44,24 +44,25 @@ class Main:
     def excecute(self, msg):
         """Executes the message"""
         if msg == "STOPSTOP::":
-            raise KeyboardInterrupt
+            raise Exception
         self.sendCommands.excecute(msg)
 
 if __name__ == "__main__":
+    print("Starting at " + datetime.datetime.now().strftime('%d-%m-%y %H:%M:%S'))
     try:
         print("Sleeping till system is fully opperationel...")
-        sleep(10)
+        sleep(8)
         main = Main()
         print("Main aangeroepen")
         main.loop()
     except KeyboardInterrupt:
-        subprocess.Popen("shutdown -h now")
-        main.server.tornado.join()
-        main.joystick.thread.join()
-        main.sendCommands.thread.join()
+        main.server.tornado.join(0.0)
+        main.joystick.thread.join(0.0)
+        main.sendCommands.thread.join(0.0)
         exit(0)
     except Exception:
-        main.server.tornado.join()
-        main.joystick.thread.join()
-        main.sendCommands.thread.join()
+        subprocess.Popen(["sudo", "shutdown", "-h", "now"])
+        main.server.tornado.join(0.0)
+        main.joystick.thread.join(0.0)
+        main.sendCommands.thread.join(0.0)
         exit(1)
